@@ -62,7 +62,7 @@ class _LoginScreen extends State<LoginScreen>{
 
                 TextField(
                   decoration: InputDecoration(
-                    hintText: "Username",
+                    hintText: "Email adress",
                     hintStyle: TextStyle(color: Theme_Colors.primary)
                   ),
                 ),

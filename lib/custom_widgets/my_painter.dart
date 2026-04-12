@@ -7,8 +7,8 @@
   void paint(Canvas canvas, Size size) {
     Rect rect = Rect.fromCenter(
       center: Offset(size.width / 2, size.height / 2),
-      width: 100,
-      height: 50,
+      width: 250,
+      height: 250,
     ); 
 
     Paint paint = Paint()

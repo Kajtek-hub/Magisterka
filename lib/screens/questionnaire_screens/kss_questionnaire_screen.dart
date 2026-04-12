@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:magisterka/custom_widgets/custom_button.dart';
 import 'package:magisterka/theme.dart';
+import 'package:magisterka/custom_widgets/custom_ListTile.dart';
 
 class KssQuestionnaireScreen extends StatefulWidget {
   const KssQuestionnaireScreen(this.onKss, {super.key});
@@ -13,18 +14,28 @@ class KssQuestionnaireScreen extends StatefulWidget {
 }
 
 class _KssQuestionnaireScreen extends State<KssQuestionnaireScreen> {
-  final List<Map<String, String>> kssOption = [
-    {"value": "1", "label": "Niezwykle czujny/a"},
-    {"value": "2", "label": ""},
-    {"value": "3", "label": "Czujny/a"},
-    {"value": "4", "label": ""},
-    {"value": "5", "label": "Ani czujny/a, ani senny/a"},
-    {"value": "6", "label": ""},
-    {"value": "7", "label": "Senny/a, ale bez trudności opieram się senności"},
-    {"value": "8", "label": ""},
-    {"value": "9", "label": "Niezmiernie senny/a, walczę ze snem"},
-  ];
-
+  //final List<Map<String, String>> kssOption = [
+  //  {"value": "1", "label": "Niezwykle czujny/a"},
+  //  {"value": "2", "label": ""},
+  //  {"value": "3", "label": "Czujny/a"},
+  //  {"value": "4", "label": ""},
+  //  {"value": "5", "label": "Ani czujny/a, ani senny/a"},
+  //  {"value": "6", "label": ""},
+  //  {"value": "7", "label": "Senny/a, ale bez trudności opieram się senności"},
+  //  {"value": "8", "label": ""},
+  //  {"value": "9", "label": "Niezmiernie senny/a, walczę ze snem"},
+  //];
+final List<String> kssOption = [
+  "1 Extremely alert",
+  "2",
+  "3 Alert",
+  "4",
+  "5 Neither alert nor sleepy",
+  "6",
+  "7 Sleepy, but I can easily resist sleepiness",
+  "8",
+  "9 Extremely sleepy, fighting sleep",
+];
   int? _selectedValue; //Jak obejrze filmiki to poprawie
   @override
   Widget build(BuildContext context) {
@@ -45,35 +56,25 @@ class _KssQuestionnaireScreen extends State<KssQuestionnaireScreen> {
                 SizedBox(height: 40),
                 Text(
                   'How sleepy are you?',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white,
+                  fontSize: 32),
                 ),
                 SizedBox(height: 40),
                 RadioGroup<int>(
-                  //value: _selectedValue,
-                  onChanged: (int? val) {
+                  groupValue: _selectedValue , 
+                  onChanged: (int? value){
                     setState(() {
-                      _selectedValue = val;
+                      _selectedValue = value;
+                      print(_selectedValue);
                     });
-                  },
-                  child: Column(
-                    children: [
-                      ...kssOption.map((option) {
-                        final int value = int.parse(option["value"]!,); //Do poprawy wykrzyknik
-                        final String label = option["label"]!;
-
-                        return RadioListTile<int>(
-                          contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12,
-                          ),
-                          value: value,
-                          fillColor: WidgetStateProperty.all(Colors.white),
-                          title: Text(label.isNotEmpty ? "$value - $label" : "$value",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
+                }, 
+                child: Column(
+                  children: List.generate(kssOption.length, (index){
+                    
+                    return CustomListTile(tileTitle: kssOption[index], tileValue: index+1);
+                  })
+                  
+                )),
                 SizedBox(height: 20),
                 CustomButton(
                   '/questionnaires-menu-screen',
