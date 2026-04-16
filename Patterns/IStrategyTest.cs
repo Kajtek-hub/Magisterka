@@ -1,26 +1,48 @@
 namespace Backend.Patterns;
+using Backend.Models;
 public interface ITestStrategy
 {
-    int CalculateResult(int input);
+        
+    string Name { get; }
+    void Apply(Test test);
 }
 
 public class PvtStrategy : ITestStrategy
 {
-    public int CalculateResult(int input)
+    public string Name => "PVT";
+
+    public void Apply(Test test)
     {
-        return input;
+        var engine = new RuleEngine<Test>()
+            .IF(t => t.testResult <= 200)
+                .THEN(t => t.testInterpretation = new FastTestReaction())
+
+            .IF(t => t.testResult <= 350)
+                .THEN(t => t.testInterpretation = new NormalTestReaction())
+
+            .IF(t => t.testResult <= 500)
+                .THEN(t => t.testInterpretation = new SlowTestReaction())
+
+            .IF(t => t.testResult > 500)
+                .THEN(t => t.testInterpretation = new LapseTestReaction());
+
+        engine.EXECUTE(test);
     }
 }
 
 public class KSSStrategy : ITestStrategy
 {
-    public int CalculateResult(int input)
+    public string Name => "KSS";
+
+    public void Apply(Test test)
     {
-        return Math.Clamp(input, 1, 9);
+        test.testInterpretation = new NormalTestReaction();
     }
 }
 
-public static class TestStrategyFactory
+
+
+public static class TestRuleSetFactory
 {
     public static ITestStrategy Get(string type)
     {

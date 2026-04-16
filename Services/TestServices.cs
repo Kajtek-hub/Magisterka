@@ -5,7 +5,13 @@ namespace Backend.Services;
 public class TestService : ITestService
 {
     private readonly List<Test> _tests = new();
+    
+    private readonly IUserService _userService;
 
+    public TestService(IUserService userService)
+    {
+        _userService = userService;
+    }
     public Task<List<Test>> GetAllAsync()
     {
         return Task.FromResult(_tests);
@@ -17,23 +23,26 @@ public class TestService : ITestService
         return Task.FromResult(test);
     }
 
-public Task<Test> CreateAsync(AddTestDTO dto)
+public async Task<Test> CreateAsync(AddTestDTO dto)
 {
-    var strategy = TestStrategyFactory.Get(dto.TestType);
+        var user = await _userService.GetByIdAsync(dto.UserId);
 
-    var calculatedResult = strategy.CalculateResult(dto.testResult);
 
-    var test = new Test
-    {
-        Id = Guid.NewGuid(),
-        CreatedAt = DateTime.UtcNow,
-        testType = dto.TestType,
-        testResult = calculatedResult,
-        UserId = dto.UserId
-    };
+        var test = new Test
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            testType = dto.testType,
+            testResult = dto.testResult,
+            UserId = user.Id,
+            user = user
+        };
 
-    _tests.Add(test);
+        var ruleSet = TestRuleSetFactory.Get(dto.testType);
+        ruleSet.Apply(test);
 
-    return Task.FromResult(test);
-}
+        _tests.Add(test);
+
+        return test;
+    }
 }
