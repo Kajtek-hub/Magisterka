@@ -1,4 +1,6 @@
 using Backend.Models;
+using Backend.DTO;
+using Backend.Patterns;
 namespace Backend.Services;
 public class TestService : ITestService
 {
@@ -15,12 +17,23 @@ public class TestService : ITestService
         return Task.FromResult(test);
     }
 
-    public Task<Test> CreateAsync(Test test)
-    {
-        test.Id = Guid.NewGuid();
-        test.CreatedAt = DateTime.UtcNow;
+public Task<Test> CreateAsync(AddTestDTO dto)
+{
+    var strategy = TestStrategyFactory.Get(dto.TestType);
 
-        _tests.Add(test);
-        return Task.FromResult(test);
-    }
+    var calculatedResult = strategy.CalculateResult(dto.testResult);
+
+    var test = new Test
+    {
+        Id = Guid.NewGuid(),
+        CreatedAt = DateTime.UtcNow,
+        testType = dto.TestType,
+        testResult = calculatedResult,
+        UserId = dto.UserId
+    };
+
+    _tests.Add(test);
+
+    return Task.FromResult(test);
+}
 }

@@ -7,6 +7,6 @@ public class TestDTO
     public TestType testType {get; set;}
     public int testResult {get; set;}
     public DateTime CreatedAt { get; set; }
-    //public TestInterpretation? testInterpretation {get; set;}
+    public TestInterpretation? testInterpretation {get; set;}
     public Guid UserId {get; set;}
 }

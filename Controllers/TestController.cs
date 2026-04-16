@@ -1,4 +1,4 @@
-using Backend.Models;
+using Backend.DTO;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers;
@@ -33,7 +33,7 @@ public class TestController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Test test)
+    public async Task<IActionResult> Create(AddTestDTO test)
     {
         var created = await _testService.CreateAsync(test);
         return Ok(created);
