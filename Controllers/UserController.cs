@@ -1,5 +1,7 @@
 using Backend.Models;
 using Backend.Services;
+using Backend.DTO;
+using Backend.Patterns;
 using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers;
 
@@ -18,7 +20,17 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var users = await _userService.GetAllAsync();
-        return Ok(users);
+
+        var result = users.Select(u => new UserDTO
+        {
+            Id = u.Id,
+            UserName = u.UserName,
+            Age = u.GetAge(),
+            Sex = u.Sex,
+            Email = u.Email
+        });
+
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
@@ -29,13 +41,32 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound();
 
-        return Ok(user);
+        var result = new UserDTO
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Age = user.GetAge(),
+            Sex = user.Sex,
+            Email = user.Email
+        };
+
+        return Ok(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(User user)
+    public async Task<IActionResult> Create(AddUserDTO dto)
     {
+        var user = UserFactory.Create(dto);
+
         var created = await _userService.CreateAsync(user);
-        return Ok(created);
+
+        return Ok(new UserDTO
+        {
+            Id = created.Id,
+            UserName = created.UserName,
+            Age = created.GetAge(),
+            Sex = created.Sex,
+            Email = created.Email
+        });
     }
 }

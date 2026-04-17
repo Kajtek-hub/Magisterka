@@ -5,10 +5,9 @@ namespace Backend.Services;
 public class TestService : ITestService
 {
     private readonly List<Test> _tests = new();
-    
     private readonly IUserService _userService;
 
-    public TestService(IUserService userService)
+public TestService(IUserService userService)
     {
         _userService = userService;
     }
@@ -25,8 +24,10 @@ public class TestService : ITestService
 
 public async Task<Test> CreateAsync(AddTestDTO dto)
 {
-        var user = await _userService.GetByIdAsync(dto.UserId);
+    var user = await _userService.GetByIdAsync(dto.UserId);
 
+    if (user == null)
+        throw new Exception("User not found");
 
         var test = new Test
         {

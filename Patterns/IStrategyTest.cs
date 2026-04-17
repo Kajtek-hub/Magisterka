@@ -14,13 +14,13 @@ public class PvtStrategy : ITestStrategy
     public void Apply(Test test)
     {
         var engine = new RuleEngine<Test>()
-            .IF(t => t.testResult <= 200)
+            .IF(t => t.testResult <= 200 )
                 .THEN(t => t.testInterpretation = new FastTestReaction())
 
-            .IF(t => t.testResult <= 350)
+            .IF(t => t.testResult > 200 && t.testResult <= 350)
                 .THEN(t => t.testInterpretation = new NormalTestReaction())
 
-            .IF(t => t.testResult <= 500)
+            .IF(t => t.testResult > 350 && t.testResult <= 500)
                 .THEN(t => t.testInterpretation = new SlowTestReaction())
 
             .IF(t => t.testResult > 500)
@@ -39,8 +39,6 @@ public class KSSStrategy : ITestStrategy
         test.testInterpretation = new NormalTestReaction();
     }
 }
-
-
 
 public static class TestRuleSetFactory
 {
