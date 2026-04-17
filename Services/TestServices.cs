@@ -1,15 +1,18 @@
 using Backend.Models;
 using Backend.DTO;
 using Backend.Patterns;
+using Backend.TestDDD;
 namespace Backend.Services;
 public class TestService : ITestService
 {
     private readonly List<Test> _tests = new();
     private readonly IUserService _userService;
+    private readonly TestDomainEventDispatcher _dispatcher;
 
-public TestService(IUserService userService)
+public TestService(IUserService userService, TestDomainEventDispatcher dispatcher)
     {
         _userService = userService;
+        _dispatcher = dispatcher;
     }
     public Task<List<Test>> GetAllAsync()
     {
@@ -43,6 +46,14 @@ public async Task<Test> CreateAsync(AddTestDTO dto)
         ruleSet.Apply(test);
 
         _tests.Add(test);
+
+        var @event = new TestSettledEvent(
+            test.UserId,
+            test.testType,
+            test.testResult,
+            test.CreatedAt
+        );
+        _dispatcher.Publish(@event);
 
         return test;
     }
