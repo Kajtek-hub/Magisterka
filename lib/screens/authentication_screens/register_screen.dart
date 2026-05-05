@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/custom_widgets/custom_button.dart';
 import 'package:magisterka/theme.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:magisterka/api/api_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget{
   const RegisterScreen(this.onRegister, {super.key});
@@ -17,6 +18,29 @@ class _RegisterScreen extends State<RegisterScreen>{
 
   DateTime?  _selectedDate;
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  String? _selectedSex;
+
+
+
+  Future<void> _registerUser() async {
+    if (_selectedDate == null || _selectedSex == null) {
+      print("Missing data");
+      return;
+    }
+
+    final res = await ApiClient.post("/user", {
+      "userName": _usernameController.text,
+      "dateOfBirth": _selectedDate!.toIso8601String(),
+      "sex": _selectedSex,
+      "email": _emailController.text
+    });
+
+      print("USER CREATED: $res");
+
+      widget.onRegister();
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +83,12 @@ class _RegisterScreen extends State<RegisterScreen>{
               
                 ),
                 SizedBox(height: 30,),
-                Row(children: [
-                  //Expaned zabiera tyle miejsca ile się tylko da
-                  Expanded(child: TextFormField(
-                    decoration: InputDecoration(labelText: "First Name"),
-                    validator: (value) => value == null || value.isEmpty? "This data is required" : null, //Walidator jak jest empty lub null to zwraca że pole wymagane
-                      )
-                    ),
-                    SizedBox(width: 16,),
-                    Expanded(child: TextFormField(
-                      decoration: InputDecoration(labelText: "Last Name"),
-                      validator: (value) => value == null || value.isEmpty? "This data is required" : null,
-                    ))
-                ],),
+                TextFormField(
+                  decoration: InputDecoration(labelText: "User Name"),
+                  controller: _usernameController,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "This data is required" : null,
+                ),
                 SizedBox(height: 20,),
                 Row(children: [
                   Expanded(child: TextFormField(
@@ -99,7 +116,9 @@ class _RegisterScreen extends State<RegisterScreen>{
                   Expanded(child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: 'Sex'),
                     items: ["Male", "Female", "Others"].map((e)=>DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (value){},
+                    onChanged: (value){
+                      _selectedSex = value?.toLowerCase();
+                    },
                     validator: (value) => value==null || value.isEmpty? "This data is required" : null,
                   ))
                 ],
@@ -108,6 +127,7 @@ class _RegisterScreen extends State<RegisterScreen>{
                 SizedBox(height: 20,),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Email Adress'),
+                  controller: _emailController,
                   validator: (value) {
                     if(value == null || value.isEmpty){
                       return "This data is required";
@@ -137,7 +157,18 @@ class _RegisterScreen extends State<RegisterScreen>{
                 },
                 ),
                 SizedBox(height: 20),
-                CustomButton('/menu-screen', "Register account"),
+                ElevatedButton(
+                onPressed:() {_registerUser; Navigator.pushNamed(context, '/menu-screen');},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme_Colors.buttonBackgroundColor,
+                    foregroundColor: Theme_Colors.foreBackgroundColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text("Register account"),
+              ),
                 SizedBox(height: 20),
                 CustomButton('/login-screen', "Have an acoout? Login in")
               ],

@@ -2,7 +2,8 @@
   class MyPainter extends CustomPainter {
   void squareWithOpacity(){
   }
-  
+  final Color squareColor;
+  MyPainter({required this.squareColor});
   @override
   void paint(Canvas canvas, Size size) {
     Rect rect = Rect.fromCenter(
@@ -12,7 +13,7 @@
     ); 
 
     Paint paint = Paint()
-      ..color = Colors.black.withOpacity(1.0)
+      ..color = squareColor.withOpacity(1.0)
       ..style = PaintingStyle.fill;
     canvas.drawRect(rect, paint);
   }

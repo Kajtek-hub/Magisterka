@@ -5,6 +5,10 @@ import 'package:magisterka/screens/authentication_screens/welcome.dart';
 import 'package:magisterka/screens/menu_screens/menu_screen.dart';
 import 'package:magisterka/screens/questionnaire_screens/kss_questionnaire_screen.dart';
 import 'package:magisterka/screens/questionnaire_screens/questionnaires_menu_screen.dart';
+import 'package:magisterka/screens/test_screens/2back/two_back_instruction_screen.dart';
+import 'package:magisterka/screens/test_screens/2back/two_back_screen.dart';
+import 'package:magisterka/screens/test_screens/gonogo/gonogo_screen.dart';
+import 'package:magisterka/screens/test_screens/gonogo/gonogo_instruction_screen.dart';
 import 'package:magisterka/screens/test_screens/pvt/pvt_instruction_screen.dart';
 import 'package:magisterka/screens/test_screens/pvt/pvt_screen.dart';
 import 'package:magisterka/screens/test_screens/test_menu_screen.dart';
@@ -20,7 +24,7 @@ class AppStart extends StatefulWidget{
 
 class _AppStart extends State<AppStart>{
   void function() {
-    return null; 
+    //return null; 
   }
     @override
   Widget build(BuildContext context) {
@@ -34,6 +38,10 @@ class _AppStart extends State<AppStart>{
             '/test-menu-screen': (context) => TestMenuScreen(function),
             '/pvt-instruction-screen': (context) => PvtInstructionScreen(function),
             '/pvt-screen': (context) => PvtScreen(function),
+            '/gonogo-instruction-screen': (context) => GonogoInstructionScreen(function),
+            '/gonogo-screen': (context) => GonoGo(function),
+            '/twoback-instruction-screen':(context) => TwoBackInstructionScreen(function),
+            '/twoback-screen':(context) => TwoBackScreen(function),
             '/questionnaires-menu-screen': (context) => QuestionnairesMenuScreen(function),
             '/kss-questionnaire-screen': (context) => KssQuestionnaireScreen(function),
 

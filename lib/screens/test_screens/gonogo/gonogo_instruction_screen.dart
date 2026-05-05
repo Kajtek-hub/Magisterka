@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/custom_widgets/custom_button.dart';
 import 'package:magisterka/theme.dart';
 
-class TestMenuScreen extends StatelessWidget{
-  
-  const TestMenuScreen(this.onTestMenu, {super.key});
-  
-  final void Function() onTestMenu;
-  
+class GonogoInstructionScreen extends StatelessWidget{
+
+  const GonogoInstructionScreen (this.onGonogoInstruction, {super.key});
+
+  final void Function() onGonogoInstruction;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,23 +15,21 @@ class TestMenuScreen extends StatelessWidget{
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
             Theme_Colors.background1,
-            Theme_Colors.background2
+            Theme_Colors.background2,
           ],
           begin: AlignmentGeometry.topLeft,
           end: AlignmentGeometry.bottomRight)
+          
         ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomButton('/pvt-instruction-screen', 'PVT'),
-              SizedBox(height: 20,),
-              CustomButton('/gonogo-instruction-screen', 'Go/No Go'),
-              SizedBox(height: 20,),
-              CustomButton('/menu-screen', 'Menu'),
+              Text('', style: TextStyle(color: Colors.white),),
+              SizedBox(height: 40,),
+              CustomButton('/twoback-screen', 'I understand')
             ],
           ),
-
         ),
       ),
     );

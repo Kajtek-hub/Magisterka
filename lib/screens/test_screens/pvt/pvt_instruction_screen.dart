@@ -30,7 +30,7 @@ class PvtInstructionScreen extends StatelessWidget{
               SizedBox(height: 20,),
               Text('Do not tap the screen before the stimulus appears, as this will be counted as an error. Try to stay focused throughout the entire test and avoid any interruptions such as notifications or background activity.', style: TextStyle(color: Colors.white),),
               SizedBox(height: 40),
-              CustomButton('/pvt-screen', 'Understand'),
+              CustomButton('/pvt-screen', 'I understand'),
             ],
           ),
         ),

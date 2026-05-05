@@ -88,7 +88,7 @@ class _PvtScreen extends State<PvtScreen>{
             children: [
               CustomPaint(
                     size: const Size(250, 250), 
-                    painter: MyPainter(),
+                    painter: MyPainter(squareColor: Colors.black),
                     child: ElevatedButton(onPressed: (){
                       _stopTimer();
                       Navigator.pushNamed(context, '/kss-questionnaire-screen');
@@ -111,3 +111,5 @@ class _PvtScreen extends State<PvtScreen>{
     );
   }
 }
+
+//To Do ochrona przed falstartem
