@@ -26,6 +26,9 @@ class _Gonogo extends State<GonoGo>{
   int colorlistIter = 0;
 
   int result = 0;
+  int hits = 0;
+  int misses = 0;
+  int falseAlarms = 0;
 
 
   void createTestVector(int goLength, int noGoLength){
