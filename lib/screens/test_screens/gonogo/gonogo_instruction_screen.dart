@@ -25,9 +25,9 @@ class GonogoInstructionScreen extends StatelessWidget{
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('', style: TextStyle(color: Colors.white),),
+              Text('In this test, colored squares will appear on the screen. When you see a green square, tap the screen as quickly as possible. When a red square appears, do not react. Try to respond quickly and accurately, avoiding mistakes. The squares will appear at random intervals, so stay focused throughout the test. Tap “I understand” to begin.', style: TextStyle(color: Colors.white),),
               SizedBox(height: 40,),
-              CustomButton('/twoback-screen', 'I understand')
+              CustomButton('/gonogo-screen', 'I understand')
             ],
           ),
         ),

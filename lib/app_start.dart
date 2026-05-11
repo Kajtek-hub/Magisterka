@@ -12,6 +12,7 @@ import 'package:magisterka/screens/test_screens/gonogo/gonogo_instruction_screen
 import 'package:magisterka/screens/test_screens/pvt/pvt_instruction_screen.dart';
 import 'package:magisterka/screens/test_screens/pvt/pvt_screen.dart';
 import 'package:magisterka/screens/test_screens/stroop/stroop.dart';
+import 'package:magisterka/screens/test_screens/stroop/stroop_instruction_screen.dart';
 import 'package:magisterka/screens/test_screens/test_menu_screen.dart';
 
 class AppStart extends StatefulWidget{
@@ -43,6 +44,7 @@ class _AppStart extends State<AppStart>{
             '/gonogo-screen': (context) => GonoGo(function),
             '/twoback-instruction-screen':(context) => TwoBackInstructionScreen(function),
             '/twoback-screen':(context) => TwoBackScreen(function),
+            '/stroop-instruction-screen':(context) => StroopInstructionScreen(function),
             '/stroop-screen':(context) => Stroop(function),
             '/questionnaires-menu-screen': (context) => QuestionnairesMenuScreen(function),
             '/kss-questionnaire-screen': (context) => KssQuestionnaireScreen(function),

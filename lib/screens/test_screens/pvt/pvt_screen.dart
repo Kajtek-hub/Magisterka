@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 //import 'package:magisterka/custom_widgets/custom_button.dart';
 import 'package:magisterka/theme.dart';
-import 'package:magisterka/custom_widgets/my_painter.dart';
 import 'dart:math';
 import 'dart:async';
 
@@ -23,9 +22,17 @@ class _PvtScreen extends State<PvtScreen>{
   int rollTimeDuration = 0;
   int pvtResult = 0;
   bool isPvtVisible = false;
+  Timer? prepTimer;
 
   void prepCounter(){
+
+    prepTimer?.cancel();
+
+    rollTimeDuration = Random().nextInt(8000) + 2000;
+
     Timer.periodic(const Duration(milliseconds: 1),(timer){
+
+
       if(rollTimeDuration != 0){
         setState(() {
           rollTimeDuration--;
@@ -33,12 +40,14 @@ class _PvtScreen extends State<PvtScreen>{
       }
       else{
         timer.cancel();
-        print(rollTimeDuration);
+        //print(rollTimeDuration);
         _startTimer();
         
       }
     });
   }
+
+
 
   Timer? _timer;
   void _startTimer(){
@@ -57,13 +66,14 @@ class _PvtScreen extends State<PvtScreen>{
       _timer!.cancel();
       _timer = null;
       print(pvtResult);
+      isPvtVisible = false;
     }
   }
 
   @override
   void initState(){
     super.initState();
-    rollTimeDuration = Random().nextInt(8000) + 2000;
+    
     print(rollTimeDuration);
     prepCounter();
   }
@@ -86,21 +96,52 @@ class _PvtScreen extends State<PvtScreen>{
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomPaint(
-                    size: const Size(250, 250), 
-                    painter: MyPainter(squareColor: Colors.black),
-                    child: ElevatedButton(onPressed: (){
-                      _stopTimer();
-                      Navigator.pushNamed(context, '/kss-questionnaire-screen');
 
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isPvtVisible == false? Colors.black : Colors.red,
-                      foregroundColor: isPvtVisible == false? Colors.black : Colors.white
+              GestureDetector(
+                onTap: () {
+
+                  if (!isPvtVisible) {
+
+                    print("FALSE START");
+                    prepCounter();
+
+                  } else {
+
+                    _stopTimer();
+
+                    Navigator.pushNamed(
+                      context,
+                      '/test-menu-screen',
+                    );
+                  }
+                },
+
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 15),
+
+                  width: 250,
+                  height: 250,
+
+                  decoration: BoxDecoration(
+                    color: isPvtVisible
+                        ? Colors.red
+                        : Colors.black,
+
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+
+                  alignment: Alignment.center,
+
+                  child: Text(
+                    pvtResult.toString(),
+                    style: TextStyle(
+                      color: isPvtVisible ?Colors.white :Colors.black,
+                      fontSize: 42,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: Text(pvtResult.toString()),
-                    ),
-              ),
+                  ),
+                ),
+              )
               //W razie potrezby tymaczasowego użytku
               //SizedBox(height: 120,),
               //CustomButton('/test-menu-screen', 'Temporary usage'),

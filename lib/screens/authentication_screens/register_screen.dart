@@ -3,7 +3,7 @@ import 'package:magisterka/custom_widgets/custom_button.dart';
 import 'package:magisterka/theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:magisterka/api/api_client.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class RegisterScreen extends StatefulWidget{
   const RegisterScreen(this.onRegister, {super.key});

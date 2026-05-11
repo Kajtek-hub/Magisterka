@@ -24,9 +24,9 @@ class TwoBackInstructionScreen extends StatelessWidget{
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('In this test, colored squares will appear on the screen. When you see a green square, tap the screen as quickly as possible. When a red square appears, do not react. Try to respond quickly and accurately, avoiding mistakes. The squares will appear at random intervals, so stay focused throughout the test. Tap “I understand” to begin.', style: TextStyle(color: Colors.white),),
+              Text('In the 2-back test, numbers appear on the screen one after another. Your task is to respond when the current number matches the one displayed two steps earlier. If you notice a match, press the “Press Me” button. Try to respond quickly and only when you’re sure.', style: TextStyle(color: Colors.white),),
               SizedBox(height: 40,),
-              CustomButton('/gonogo-screen', 'I understand')
+              CustomButton('/twoback-screen', 'I understand')
             ],
           ),
         ),

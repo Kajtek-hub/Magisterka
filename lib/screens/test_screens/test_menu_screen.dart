@@ -28,9 +28,9 @@ class TestMenuScreen extends StatelessWidget{
               SizedBox(height: 20,),
               CustomButton('/gonogo-instruction-screen', 'Go/No Go'),
               SizedBox(height: 20,),
-              CustomButton('/twoback-screen', 'N-Back'),
+              CustomButton('/twoback-instruction-screen', 'N-Back'),
               SizedBox(height: 20,),
-              CustomButton('/stroop-screen', 'Stroop'),
+              CustomButton('/stroop-instruction-screen', 'Stroop'),
               SizedBox(height: 20,),
               CustomButton('/menu-screen', 'Menu'),
               
