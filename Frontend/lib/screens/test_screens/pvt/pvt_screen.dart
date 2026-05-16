@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/theme.dart';
 import 'dart:math';
 import 'dart:async';
+import 'package:magisterka/api/secure_storage.dart';
+import 'package:magisterka/api/test_service.dart';
 
 
 class PvtScreen extends StatefulWidget{
@@ -61,12 +63,27 @@ class _PvtScreen extends State<PvtScreen>{
     });
   }
 
-  void _stopTimer(){
+  void _stopTimer()async{
     if(_timer != null && rollTimeDuration == 0){
       _timer!.cancel();
       _timer = null;
-      print(pvtResult);
-      isPvtVisible = false;
+      setState(() {
+        isPvtVisible = false;
+      });
+      try {
+        final userId = await SecureStorage.getUserId();
+        if (userId != null) {
+          await TestService.savePVT(
+            userId: userId,
+            reactionTime: pvtResult,
+          );
+        }
+      } catch (e) {
+        print("Saving PVT error: $e");
+      }
+      if (mounted) {
+        Navigator.pushNamed(context, '/test-menu-screen');
+      }
     }
   }
 
@@ -76,6 +93,13 @@ class _PvtScreen extends State<PvtScreen>{
     
     print(rollTimeDuration);
     prepCounter();
+  }
+
+  @override
+  void dispose() {
+    prepTimer?.cancel();
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -106,13 +130,8 @@ class _PvtScreen extends State<PvtScreen>{
                     prepCounter();
 
                   } else {
-
                     _stopTimer();
-
-                    Navigator.pushNamed(
-                      context,
-                      '/test-menu-screen',
-                    );
+                    //Navigator.pushNamed(context,'/test-menu-screen',);
                   }
                 },
 

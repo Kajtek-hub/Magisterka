@@ -3,40 +3,28 @@ namespace Backend.Models;
 
 public class PVTTest : Test
 {
-    public int AverageReactionTime { get; set; }
-
-    public int Lapses { get; set; }
-
-    public int FastestReaction { get; set; }
-
-    public int SlowestReaction { get; set; }
+    public int ReactionTime { get; set; }
 }
+
 public class GoNoGoTest : Test
 {
-    public int CorrectResponses { get; set; }
-
-    public int IncorrectResponses { get; set; }
-
-    public int MissedResponses { get; set; }
-
-    public int AverageReactionTime { get; set; }
+    public int Hits { get; set; }
+    public int Misses { get; set; }
+    public int FalseAlarms { get; set; }
+    public int CorrectRejections { get; set; }
 }
+
 public class NBackTest : Test
 {
-    public int CorrectAnswers { get; set; }
-
-    public int IncorrectAnswers { get; set; }
-
-    public int AccuracyPercent { get; set; }
+    public int Hits { get; set; }
+    public int Misses { get; set; }
+    public int FalseAlarms { get; set; }
 }
 
 public class StroopTest : Test
 {
-    public int CongruentReactionTime { get; set; }
-
-    public int IncongruentReactionTime { get; set; }
-
-    public int Errors { get; set; }
+    public int Correct { get; set; }
+    public int Incorrect { get; set; }
 }
 
 public class KSSTest : Test

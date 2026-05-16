@@ -23,11 +23,19 @@ public class AuthService : IAuthService
 
     public async Task<User> RegisterAsync(RegisterDTO dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.UserName))
+            throw new Exception("The username cannot be empty");
+
+        if (dto.Password.Length < 6)
+            throw new Exception("Password must be at least 6 characters long");
+
+        if (dto.Age < 0 || dto.Age > 150)
+            throw new Exception("Enter the correct age");
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.UserName == dto.UserName);
 
         if (existingUser != null)
-            throw new Exception("User with this username already exists");
+            throw new Exception("A user with that name already exists");
 
         var user = new User
         {
@@ -39,7 +47,17 @@ public class AuthService : IAuthService
         };
 
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // łapie duplikat który przeszedł przez sprawdzenie wyżej
+            // (np. równoczesne zapytania)
+            throw new Exception("A user with that name already exists");
+        }
 
         return user;
     }
@@ -50,12 +68,12 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(x => x.UserName == dto.UserName);
 
         if (user == null)
-            throw new Exception("Invalid credentials");
+            throw new Exception("Incorrect login credentials");
 
         var result = _hasher.VerifyHashedPassword(user, user.PasswordHash!, dto.Password);
 
         if (result == PasswordVerificationResult.Failed)
-            throw new Exception("Invalid credentials");
+            throw new Exception("Incorrect login credentials");
 
         return GenerateJwt(user);
     }

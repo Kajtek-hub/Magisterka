@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:magisterka/custom_widgets/custom_button.dart';
 import 'package:magisterka/theme.dart';
 import 'package:magisterka/custom_widgets/custom_ListTile.dart';
+import 'package:magisterka/api/secure_storage.dart';
+import 'package:magisterka/api/test_service.dart';
 
 class KssQuestionnaireScreen extends StatefulWidget {
   const KssQuestionnaireScreen(this.onKss, {super.key});
 
   final void Function() onKss;
+
   @override
   State<StatefulWidget> createState() {
     return _KssQuestionnaireScreen();
@@ -14,29 +16,45 @@ class KssQuestionnaireScreen extends StatefulWidget {
 }
 
 class _KssQuestionnaireScreen extends State<KssQuestionnaireScreen> {
-  //final List<Map<String, String>> kssOption = [
-  //  {"value": "1", "label": "Niezwykle czujny/a"},
-  //  {"value": "2", "label": ""},
-  //  {"value": "3", "label": "Czujny/a"},
-  //  {"value": "4", "label": ""},
-  //  {"value": "5", "label": "Ani czujny/a, ani senny/a"},
-  //  {"value": "6", "label": ""},
-  //  {"value": "7", "label": "Senny/a, ale bez trudności opieram się senności"},
-  //  {"value": "8", "label": ""},
-  //  {"value": "9", "label": "Niezmiernie senny/a, walczę ze snem"},
-  //];
-final List<String> kssOption = [
-  "1 Extremely alert",
-  "2",
-  "3 Alert",
-  "4",
-  "5 Neither alert nor sleepy",
-  "6",
-  "7 Sleepy, but I can easily resist sleepiness",
-  "8",
-  "9 Extremely sleepy, fighting sleep",
-];
-  int? _selectedValue; //Jak obejrze filmiki to poprawie
+  final List<String> kssOption = [
+    "1 Extremely alert",
+    "2",
+    "3 Alert",
+    "4",
+    "5 Neither alert nor sleepy",
+    "6",
+    "7 Sleepy, but I can easily resist sleepiness",
+    "8",
+    "9 Extremely sleepy, fighting sleep",
+  ];
+
+  int? _selectedValue;
+
+  Future<void> _saveAndNavigate() async {
+    if (_selectedValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a sleepiness level")),
+      );
+      return;
+    }
+
+    try {
+      final userId = await SecureStorage.getUserId();
+      if (userId != null) {
+        await TestService.saveKSS(
+          userId: userId,
+          sleepinessLevel: _selectedValue!,
+        );
+      }
+    } catch (e) {
+      print("Saving KSS error: $e");
+    }
+
+    if (mounted) {
+      Navigator.pushNamed(context, '/questionnaires-menu-screen');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,33 +71,44 @@ final List<String> kssOption = [
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 40),
-                Text(
+                const SizedBox(height: 40),
+                const Text(
                   'How sleepy are you?',
-                  style: TextStyle(color: Colors.white,
-                  fontSize: 32),
+                  style: TextStyle(color: Colors.white, fontSize: 32),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 RadioGroup<int>(
-                  groupValue: _selectedValue , 
-                  onChanged: (int? value){
+                  groupValue: _selectedValue,
+                  onChanged: (int? value) {
                     setState(() {
                       _selectedValue = value;
-                      print(_selectedValue);
                     });
-                }, 
-                child: Column(
-                  children: List.generate(kssOption.length, (index){
-                    
-                    return CustomListTile(tileTitle: kssOption[index], tileValue: index+1);
-                  })
-                  
-                )),
-                SizedBox(height: 20),
-                CustomButton(
-                  '/questionnaires-menu-screen',
-                  'Questionnaires menu',
+                  },
+                  child: Column(
+                    children: List.generate(kssOption.length, (index) {
+                      return CustomListTile(
+                        tileTitle: kssOption[index],
+                        tileValue: index + 1,
+                      );
+                    }),
+                  ),
                 ),
+                const SizedBox(height: 20),
+                
+                ElevatedButton(
+                  onPressed: _saveAndNavigate,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme_Colors.buttonBackgroundColor,
+                    foregroundColor: Theme_Colors.foreBackgroundColor,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14, horizontal: 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text("Questionnaires menu"),
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

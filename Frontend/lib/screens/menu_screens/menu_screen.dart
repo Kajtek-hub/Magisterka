@@ -28,7 +28,7 @@ class MenuScreen extends StatelessWidget{
               SizedBox(height: 20,),
               CustomButton('/questionnaires-menu-screen', 'Questionnaire'),
               SizedBox(height: 20,),
-              CustomButton('/result-menu-screen', 'Your Results'),
+              CustomButton('/result-screen', 'Your Results'),
               SizedBox(height: 20,),
               CustomButton('/login-screen', 'Log out')
             ],

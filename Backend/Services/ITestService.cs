@@ -1,20 +1,19 @@
-
-using Backend.Models;
 using Backend.DTO;
-namespace Backend.Services;
 using Backend.Models;
 
-
+namespace Backend.Services;
 
 public interface ITestService
 {
-    Task<PVTTest> CreatePVTAsync(PVTTest test);
+    Task<TestResultDTO> CreatePVTAsync(PVTTestDTO dto);
+    Task<TestResultDTO> CreateGoNoGoAsync(GoNoGoTestDTO dto);
+    Task<TestResultDTO> CreateNBackAsync(NBackTestDTO dto);
+    Task<TestResultDTO> CreateStroopAsync(StroopTestDTO dto);
+    Task<TestResultDTO> CreateKSSAsync(KSSTestDTO dto);
 
-    Task<GoNoGoTest> CreateGoNoGoAsync(GoNoGoTest test);
-
-    Task<NBackTest> CreateNBackAsync(NBackTest test);
-
-    Task<StroopTest> CreateStroopAsync(StroopTest test);
-
-    Task<KSSTest> CreateKSSAsync(KSSTest test);
+    Task<List<TestResultDTO>> GetPVTByUserAsync(Guid userId);
+    Task<List<TestResultDTO>> GetGoNoGoByUserAsync(Guid userId);
+    Task<List<TestResultDTO>> GetNBackByUserAsync(Guid userId);
+    Task<List<TestResultDTO>> GetStroopByUserAsync(Guid userId);
+    Task<List<TestResultDTO>> GetKSSByUserAsync(Guid userId);
 }

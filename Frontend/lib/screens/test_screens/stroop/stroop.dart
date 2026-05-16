@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/theme.dart';
 import 'dart:math';
 import 'dart:async';
-
+import 'package:magisterka/api/secure_storage.dart';
+import 'package:magisterka/api/test_service.dart';
 
 class Stroop extends StatefulWidget{
   const Stroop(this.onStroop, {super.key});
@@ -59,16 +60,31 @@ class _Stroop extends State<Stroop>{
   }
 
   void timer(){
-    Timer.periodic(const Duration(seconds: 1),(timer){
+    Timer.periodic(const Duration(seconds: 1),(timer)async{
       if(testTime>0){
         setState(() {
           testTime--;
         });
       }else{
         timer.cancel();
-        Navigator.pushNamed(context, '/test-menu-screen');
-        print(correct);
-        print(incorrect);
+        try{
+        final userId = await SecureStorage.getUserId();
+          if (userId != null) {
+          await TestService.saveStroop(
+            userId: userId,
+            correct: correct,
+            incorrect: incorrect,
+          );
+        }
+        }catch (e){
+          print("Saving Stroop error: $e");
+        }
+        if(mounted){
+          Navigator.pushNamed(context, '/test-menu-screen');
+        }
+        
+        //print(correct);
+        //print(incorrect);
       }
     });
   }

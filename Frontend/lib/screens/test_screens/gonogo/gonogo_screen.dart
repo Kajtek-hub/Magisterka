@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/theme.dart';
 import 'dart:math';
 import 'dart:async';
-
+import 'package:magisterka/api/secure_storage.dart';
+import 'package:magisterka/api/test_service.dart';
 
 class GonoGo extends StatefulWidget{
 
@@ -107,7 +108,7 @@ class _Gonogo extends State<GonoGo>{
   }
 
   void timer(){
-    Timer.periodic(const Duration(milliseconds: 100), (timer){
+    Timer.periodic(const Duration(milliseconds: 100), (timer)async{
 
       if(colorlistIter != testColorList.length){
 
@@ -137,16 +138,31 @@ class _Gonogo extends State<GonoGo>{
              
           }}
         });
-
       }
       else{
         timer.cancel();
-        Navigator.pushNamed(context, '/test-menu-screen');
+        try{
+          final userId = await SecureStorage.getUserId();
+          if (userId != null) {
+            await TestService.saveGoNoGo(
+              userId: userId,
+              hits: hits,
+              misses: misses,
+              falseAlarms: falseAlarms,
+              correctRejections: correctRejections,
+            );
+          }
+        }catch(e){
+          print("Saving Go/NoGo error: $e");
+        }
+        if (mounted) {
+          Navigator.pushNamed(context, '/test-menu-screen');
+        }
         //print(result);
-        print('Hits : $hits ');
-        print('Misses : $misses');
-        print('False Alarms : $falseAlarms');
-        print('correctRejections : $correctRejections');
+        //print('Hits : $hits ');
+        //print('Misses : $misses');
+        //print('False Alarms : $falseAlarms');
+        //print('correctRejections : $correctRejections');
         return;
       }
     });

@@ -18,6 +18,13 @@ class _LoginScreen extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   Future<void> _login() async {
+    if (_usernameController.text.trim().isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Fill in all fields")),
+      );
+        return;
+      }
+
     try {
       final res = await ApiClient.post("/auth/login", {
         "userName": _usernameController.text,
@@ -37,6 +44,13 @@ class _LoginScreen extends State<LoginScreen> {
         );
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override

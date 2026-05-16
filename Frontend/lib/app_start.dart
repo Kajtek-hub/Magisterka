@@ -5,6 +5,7 @@ import 'package:magisterka/screens/authentication_screens/welcome.dart';
 import 'package:magisterka/screens/menu_screens/menu_screen.dart';
 import 'package:magisterka/screens/questionnaire_screens/kss_questionnaire_screen.dart';
 import 'package:magisterka/screens/questionnaire_screens/questionnaires_menu_screen.dart';
+import 'package:magisterka/screens/result_screen/result_screen.dart';
 import 'package:magisterka/screens/test_screens/2back/two_back_instruction_screen.dart';
 import 'package:magisterka/screens/test_screens/2back/two_back_screen.dart';
 import 'package:magisterka/screens/test_screens/gonogo/gonogo_screen.dart';
@@ -48,7 +49,7 @@ class _AppStart extends State<AppStart>{
             '/stroop-screen':(context) => Stroop(function),
             '/questionnaires-menu-screen': (context) => QuestionnairesMenuScreen(function),
             '/kss-questionnaire-screen': (context) => KssQuestionnaireScreen(function),
-
+            '/result-screen': (context) => ResultScreen(function)
          },
     );
   }

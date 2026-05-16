@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/theme.dart';
 import 'dart:math';
 import 'dart:async';
-
+import 'package:magisterka/api/secure_storage.dart';
+import 'package:magisterka/api/test_service.dart';
 
 class TwoBackScreen extends StatefulWidget{
   
@@ -99,7 +100,7 @@ class _TwoBackScreen extends State<TwoBackScreen>{
   }
 
   void timer(){
-    Timer.periodic(const Duration(milliseconds: 500), (timer){
+    Timer.periodic(const Duration(milliseconds: 500), (timer)async{
       if(currentNumber < 60){
 
         setState(() {
@@ -133,10 +134,26 @@ class _TwoBackScreen extends State<TwoBackScreen>{
         });
       }else{
         timer.cancel();
-        Navigator.pushNamed(context, '/test-menu-screen');
-        print('Hits : $hits ');
-        print('Misses : $misses');
-        print('False Alarms : $falseAlarms');
+        try{
+          final userId = await SecureStorage.getUserId();
+          if (userId != null) {
+            await TestService.saveNBack(
+              userId: userId,
+              hits: hits,
+              misses: misses,
+              falseAlarms: falseAlarms,
+            );
+          }
+                  }catch (e){
+          print("Saving 2-Back error: $e");
+        }
+        if(mounted){
+          Navigator.pushNamed(context, '/test-menu-screen');
+        }
+        
+        //print('Hits : $hits ');
+        //print('Misses : $misses');
+        //print('False Alarms : $falseAlarms');
         return;
       }
     });

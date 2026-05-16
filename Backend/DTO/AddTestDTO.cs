@@ -1,5 +1,5 @@
 
-namespace Backend.DTO;
+/*namespace Backend.DTO;
 using Backend.Models;
 
 public class AddTestDTO
@@ -10,4 +10,4 @@ public class AddTestDTO
     //public TestInterpretation? testInterpretation {get; set;}
 
     public Guid UserId {get; set;}
-}
+}*/

@@ -1,4 +1,4 @@
-using Backend.Models;
+using Backend.DTO;
 using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,43 +15,77 @@ public class TestController : ControllerBase
         _service = service;
     }
 
-    [HttpPost("pvt")]
-    public async Task<IActionResult> CreatePVT(PVTTest test)
-    {
-        var created = await _service.CreatePVTAsync(test);
+    // ── POST ─────────────────────────────────────────────
 
-        return Ok(created);
+    [HttpPost("pvt")]
+    public async Task<IActionResult> CreatePVT(PVTTestDTO dto)
+    {
+        var result = await _service.CreatePVTAsync(dto);
+        return Ok(result);
     }
 
     [HttpPost("gonogo")]
-    public async Task<IActionResult> CreateGoNoGo(GoNoGoTest test)
+    public async Task<IActionResult> CreateGoNoGo(GoNoGoTestDTO dto)
     {
-        var created = await _service.CreateGoNoGoAsync(test);
-
-        return Ok(created);
+        var result = await _service.CreateGoNoGoAsync(dto);
+        return Ok(result);
     }
 
     [HttpPost("nback")]
-    public async Task<IActionResult> CreateNBack(NBackTest test)
+    public async Task<IActionResult> CreateNBack(NBackTestDTO dto)
     {
-        var created = await _service.CreateNBackAsync(test);
-
-        return Ok(created);
+        var result = await _service.CreateNBackAsync(dto);
+        return Ok(result);
     }
 
     [HttpPost("stroop")]
-    public async Task<IActionResult> CreateStroop(StroopTest test)
+    public async Task<IActionResult> CreateStroop(StroopTestDTO dto)
     {
-        var created = await _service.CreateStroopAsync(test);
-
-        return Ok(created);
+        var result = await _service.CreateStroopAsync(dto);
+        return Ok(result);
     }
 
     [HttpPost("kss")]
-    public async Task<IActionResult> CreateKSS(KSSTest test)
+    public async Task<IActionResult> CreateKSS(KSSTestDTO dto)
     {
-        var created = await _service.CreateKSSAsync(test);
+        var result = await _service.CreateKSSAsync(dto);
+        return Ok(result);
+    }
 
-        return Ok(created);
+    // ── GET BY USER ───────────────────────────────────────
+
+    [HttpGet("pvt/user/{userId}")]
+    public async Task<IActionResult> GetPVTByUser(Guid userId)
+    {
+        var results = await _service.GetPVTByUserAsync(userId);
+        return Ok(results);
+    }
+
+    [HttpGet("gonogo/user/{userId}")]
+    public async Task<IActionResult> GetGoNoGoByUser(Guid userId)
+    {
+        var results = await _service.GetGoNoGoByUserAsync(userId);
+        return Ok(results);
+    }
+
+    [HttpGet("nback/user/{userId}")]
+    public async Task<IActionResult> GetNBackByUser(Guid userId)
+    {
+        var results = await _service.GetNBackByUserAsync(userId);
+        return Ok(results);
+    }
+
+    [HttpGet("stroop/user/{userId}")]
+    public async Task<IActionResult> GetStroopByUser(Guid userId)
+    {
+        var results = await _service.GetStroopByUserAsync(userId);
+        return Ok(results);
+    }
+
+    [HttpGet("kss/user/{userId}")]
+    public async Task<IActionResult> GetKSSByUser(Guid userId)
+    {
+        var results = await _service.GetKSSByUserAsync(userId);
+        return Ok(results);
     }
 }
