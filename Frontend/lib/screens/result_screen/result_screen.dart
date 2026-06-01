@@ -84,7 +84,7 @@ class _ResultScreen extends State<ResultScreen>
     }
   }
 
-  // ── Formatowanie daty ──────────────────────────────────
+  // Formatowanie daty
   String _formatDate(String isoDate) {
     final dt = DateTime.parse(isoDate).toLocal();
     return "${dt.day.toString().padLeft(2, '0')}."
@@ -94,7 +94,7 @@ class _ResultScreen extends State<ResultScreen>
         "${dt.minute.toString().padLeft(2, '0')}";
   }
 
-  // ── Pojedyncza karta wyniku ───────────────────────────
+  //Pojedyncza karta wyniku
   Widget _resultCard(Map<String, dynamic> item, List<Widget> rows) {
     final date = _formatDate(item['createdAt'] as String);
 
@@ -123,7 +123,7 @@ class _ResultScreen extends State<ResultScreen>
     );
   }
 
-  // ── Wiersz danych w karcie ────────────────────────────
+  // Wiersz danych w karcie
   Widget _dataRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -147,7 +147,7 @@ class _ResultScreen extends State<ResultScreen>
     );
   }
 
-  // ── Pusta lista ────────────────────────────────────────
+  // Pusta lista 
   Widget _emptyState(String testName) {
     return Center(
       child: Column(
@@ -164,7 +164,7 @@ class _ResultScreen extends State<ResultScreen>
     );
   }
 
-  // ── Listy dla każdego testu ────────────────────────────
+  // Listy dla każdego testu 
 
   Widget _pvtList() {
     if (_pvtResults.isEmpty) return _emptyState("PVT");
@@ -266,7 +266,7 @@ class _ResultScreen extends State<ResultScreen>
     );
   }
 
-  // ── BUILD ─────────────────────────────────────────────
+  // BUILD 
 
   @override
   Widget build(BuildContext context) {
@@ -284,7 +284,7 @@ class _ResultScreen extends State<ResultScreen>
             children: [
               const SizedBox(height: 16),
 
-              // ── Nagłówek ────────────────────────────────
+              // Nagłówek 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -315,19 +315,20 @@ class _ResultScreen extends State<ResultScreen>
 
               const SizedBox(height: 8),
 
-              // ── TabBar ──────────────────────────────────
+              // TabBar 
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white38,
                 indicatorColor: Theme_Colors.primary,
+                
                 tabs: _tabs.map((t) => Tab(text: t)).toList(),
               ),
 
               const SizedBox(height: 8),
 
-              // ── Zawartość ───────────────────────────────
+              //Zawartość 
               Expanded(
                 child: _loading
                     ? const Center(
