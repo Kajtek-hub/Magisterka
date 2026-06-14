@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'secure_storage.dart';
 
 class ApiClient {
-  static const baseUrl = "http://10.0.2.2:5157/api";
+  static const baseUrl = "http://10.0.2.2:5157/api"; //Emulator android studio
+ // static const baseUrl = "http://192.168.0.131:5157/api"; //Real device
 
 static Future<Map<String, dynamic>> post(
   String path,

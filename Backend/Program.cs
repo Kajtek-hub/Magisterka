@@ -59,6 +59,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     });
 
+
+// DbContext
+builder.Services.AddDbContext<BioSignalDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("BioSignalConnectionString")));
+
+// Serwis
+builder.Services.AddScoped<IBioSignalService, BioSignalService>();
+
 var app = builder.Build();
 
 app.UseSwagger();

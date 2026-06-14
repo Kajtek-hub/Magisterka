@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/screens/authentication_screens/login_screen.dart';
 import 'package:magisterka/screens/authentication_screens/register_screen.dart';
 import 'package:magisterka/screens/authentication_screens/welcome.dart';
+import 'package:magisterka/screens/bio_signals/biosignal_chart_screen.dart';
+import 'package:magisterka/screens/bio_signals/ble_recording_screen.dart';
 import 'package:magisterka/screens/menu_screens/menu_screen.dart';
 import 'package:magisterka/screens/questionnaire_screens/kss_questionnaire_screen.dart';
 import 'package:magisterka/screens/questionnaire_screens/questionnaires_menu_screen.dart';
@@ -15,6 +17,7 @@ import 'package:magisterka/screens/test_screens/pvt/pvt_screen.dart';
 import 'package:magisterka/screens/test_screens/stroop/stroop.dart';
 import 'package:magisterka/screens/test_screens/stroop/stroop_instruction_screen.dart';
 import 'package:magisterka/screens/test_screens/test_menu_screen.dart';
+import 'package:magisterka/screens/bio_signals/SignalViewerScreen.dart';
 
 class AppStart extends StatefulWidget{
     const AppStart({Key? key}) : super(key: key);
@@ -49,7 +52,10 @@ class _AppStart extends State<AppStart>{
             '/stroop-screen':(context) => Stroop(function),
             '/questionnaires-menu-screen': (context) => QuestionnairesMenuScreen(function),
             '/kss-questionnaire-screen': (context) => KssQuestionnaireScreen(function),
-            '/result-screen': (context) => ResultScreen(function)
+            '/result-screen': (context) => ResultScreen(function),
+            '/ble-recording': (context) => const BleRecordingScreen(),
+            '/biosignal-charts': (context) => const BioSignalChartScreen(),
+            '/signal-viewer': (context) => const SignalViewerScreen()
          },
     );
   }
