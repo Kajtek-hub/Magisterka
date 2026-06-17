@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:magisterka/screens/authentication_screens/login_screen.dart';
 import 'package:magisterka/screens/authentication_screens/register_screen.dart';
 import 'package:magisterka/screens/authentication_screens/welcome.dart';
+import 'package:magisterka/screens/bio_signals/SleepAnalysisScreen.dart';
 import 'package:magisterka/screens/bio_signals/biosignal_chart_screen.dart';
 import 'package:magisterka/screens/bio_signals/ble_recording_screen.dart';
 import 'package:magisterka/screens/menu_screens/menu_screen.dart';
@@ -55,7 +56,8 @@ class _AppStart extends State<AppStart>{
             '/result-screen': (context) => ResultScreen(function),
             '/ble-recording': (context) => const BleRecordingScreen(),
             '/biosignal-charts': (context) => const BioSignalChartScreen(),
-            '/signal-viewer': (context) => const SignalViewerScreen()
+            '/signal-viewer': (context) => const SignalViewerScreen(),
+            '/sleep-analysis': (context) => const SleepAnalysisScreen(),
          },
     );
   }

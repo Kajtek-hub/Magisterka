@@ -3,6 +3,11 @@ using Backend.DTO;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using MathNet.Numerics.IntegralTransforms;
+using System.Numerics;
+using System.Globalization;
+
+
 
 namespace Backend.Services;
 
@@ -68,6 +73,7 @@ public class BioSignalService : IBioSignalService
                 EegTheta = r.EegTheta,
                 EegAlpha = r.EegAlpha,
                 EegBeta = r.EegBeta,
+                EpochFeaturesJson = r.EpochFeaturesJson,
             })
             .ToListAsync();
     }
@@ -138,46 +144,178 @@ public class BioSignalService : IBioSignalService
 
     // ── Parsowanie BITalino TXT ──────────────────────────
     // Format: # nagłówki, potem: nSeq  DI1  DI2  A1  A2  A3  A4  A5  A6
-    private static List<BioSample> ParseBItalinoSamples(byte[] data)
-    {
-        var text = System.Text.Encoding.UTF8.GetString(data);
-        var samples = new List<BioSample>();
-        double ts = 0;
-        const double sampleIntervalMs = 10.0; // 100 Hz = 10ms
 
-        // Split obsługuje zarówno \r\n (Windows) jak i \n (Linux)
-        foreach (var line in text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
+
+// ── Parsowanie BITalino TXT ──────────────────────────
+private static List<BioSample> ParseBItalinoSamples(byte[] data)
+{
+    var text = System.Text.Encoding.UTF8.GetString(data);
+    var samples = new List<BioSample>();
+    double ts = 0;
+    const double sampleIntervalMs = 10.0; // 100Hz = 10ms
+
+    foreach (var line in text.Split(
+        new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
+    {
+        if (line.StartsWith('#') || string.IsNullOrWhiteSpace(line)) continue;
+
+        var parts = line.Trim().Split('\t');
+        if (parts.Length < 6) continue;
+
+        if (!double.TryParse(parts[5], NumberStyles.Any,
+            CultureInfo.InvariantCulture, out var val)) continue;
+
+        samples.Add(new BioSample { TimestampMs = ts, Value = val });
+        ts += sampleIntervalMs;
+    }
+
+    return samples;
+}
+
+private static void ParseBItalinoMetrics(BioSignalRecording r, byte[] data)
+{
+    var samples = ParseBItalinoSamples(data);
+    if (samples.Count < 3000) return;
+
+    const int fs = 100;
+    const int epochSamples = 3000;
+
+    var epochCount = samples.Count / epochSamples;
+
+    var deltaList   = new List<double>();
+    var thetaList   = new List<double>();
+    var alphaList   = new List<double>();
+    var sigmaList   = new List<double>();
+    var betaList    = new List<double>();
+    var entropyList = new List<double>(); // ← DODAJ
+
+    for (int e = 0; e < epochCount; e++)
+    {
+        var epoch = samples
+            .Skip(e * epochSamples)
+            .Take(epochSamples)
+            .Select(s => s.Value)
+            .ToArray();
+
+        double mean = epoch.Average();
+        epoch = epoch.Select(v => v - mean).ToArray();
+        epoch = ApplyNotchFilter(epoch, fs, 50.0);
+        epoch = ApplyBandpassFilter(epoch, fs, 0.5, 45.0);
+
+        // ← Zapisz complex żeby użyć go do entropii
+        var complex = epoch
+            .Select(v => new Complex(v, 0))
+            .ToArray();
+        Fourier.Forward(complex, FourierOptions.Matlab);
+
+        double delta = BandPower(complex, fs, epochSamples, 0.5, 4.0);
+        double theta = BandPower(complex, fs, epochSamples, 4.0, 8.0);
+        double alpha = BandPower(complex, fs, epochSamples, 8.0, 12.0);
+        double sigma = BandPower(complex, fs, epochSamples, 12.0, 15.0);
+        double beta  = BandPower(complex, fs, epochSamples, 15.0, 25.0);
+
+        deltaList.Add(delta);
+        thetaList.Add(theta);
+        alphaList.Add(alpha);
+        sigmaList.Add(sigma);
+        betaList.Add(beta);
+        entropyList.Add(SpectralEntropy(complex, epochSamples)); // ← DODAJ
+    }
+
+    r.EegDelta = Math.Round(deltaList.Average(), 4);
+    r.EegTheta = Math.Round(thetaList.Average(), 4);
+    r.EegAlpha = Math.Round(alphaList.Average(), 4);
+    r.EegBeta  = Math.Round(betaList.Average(), 4);
+
+    r.EpochFeaturesJson = System.Text.Json.JsonSerializer.Serialize(
+        Enumerable.Range(0, epochCount).Select(i => new
         {
-            if (line.StartsWith('#') || string.IsNullOrWhiteSpace(line)) continue;
+            epochIndex  = i,
+            timestampS  = i * 30,
+            delta       = Math.Round(deltaList[i], 6),
+            theta       = Math.Round(thetaList[i], 6),
+            alpha       = Math.Round(alphaList[i], 6),
+            sigma       = Math.Round(sigmaList[i], 6),
+            beta        = Math.Round(betaList[i],  6),
+            thetaAlpha  = Math.Round(thetaList[i] / (alphaList[i] + 1e-10), 6),
+            deltaBeta   = Math.Round(deltaList[i] / (betaList[i]  + 1e-10), 6),
+            entropy     = Math.Round(entropyList[i], 6), 
+        }).ToList()
+    );
+}
 
-            var parts = line.Trim().Split('\t');
-            if (parts.Length < 6) continue;
 
-            if (!double.TryParse(parts[5], NumberStyles.Any,
-                CultureInfo.InvariantCulture, out var val)) continue;
+private static double SpectralEntropy(Complex[] fft, int n)
+{
+    var magnitudes = fft.Take(n / 2)
+        .Select(c => c.Magnitude * c.Magnitude)
+        .ToArray();
 
-            samples.Add(new BioSample { TimestampMs = ts, Value = val });
-            ts += sampleIntervalMs;
-        }
+    double total = magnitudes.Sum() + 1e-10;
 
-        return samples;
-    }
+    return -magnitudes
+        .Select(m => {
+            double p = m / total;
+            return p > 0 ? p * Math.Log2(p) : 0;
+        })
+        .Sum();
+}
+// ── Filtr Notch (usuwa zakłócenia sieci 50Hz) ────────
+private static double[] ApplyNotchFilter(
+    double[] signal, int fs, double freqHz)
+{
+    var complex = signal.Select(v => new Complex(v, 0)).ToArray();
+    Fourier.Forward(complex, FourierOptions.Matlab);
 
-    private static void ParseBItalinoMetrics(BioSignalRecording r, byte[] data)
+    int n     = complex.Length;
+    int bin   = (int)Math.Round(freqHz * n / (double)fs);
+    int width = (int)Math.Round(1.0  * n / (double)fs); // ±1Hz
+
+    for (int i = bin - width; i <= bin + width; i++)
     {
-        var samples = ParseBItalinoSamples(data);
-        if (samples.Count < 512) return;
-
-        // Prosta aproksymacja pasm przez wariancję w oknach
-        // W produkcji użyj FFT (np. MathNet.Numerics)
-        var values = samples.Select(s => s.Value).ToArray();
-        double mean = values.Average();
-        double variance = values.Select(v => Math.Pow(v - mean, 2)).Average();
-
-        // Placeholder — zastąp prawdziwym FFT
-        r.EegDelta = Math.Round(variance * 0.40, 4);
-        r.EegTheta = Math.Round(variance * 0.25, 4);
-        r.EegAlpha = Math.Round(variance * 0.20, 4);
-        r.EegBeta  = Math.Round(variance * 0.15, 4);
+        if (i > 0 && i < n)     complex[i]     = Complex.Zero;
+        if (n - i > 0 && n - i < n) complex[n - i] = Complex.Zero;
     }
+
+    Fourier.Inverse(complex, FourierOptions.Matlab);
+    return complex.Select(c => c.Real).ToArray();
+}
+
+// ── Filtr pasmowoprzepustowy (przez zerowanie FFT) ───
+private static double[] ApplyBandpassFilter(
+    double[] signal, int fs, double lowHz, double highHz)
+{
+    var complex = signal.Select(v => new Complex(v, 0)).ToArray();
+    Fourier.Forward(complex, FourierOptions.Matlab);
+
+    int n    = complex.Length;
+    int iLow  = (int)Math.Round(lowHz  * n / (double)fs);
+    int iHigh = (int)Math.Round(highHz * n / (double)fs);
+
+    for (int i = 0; i < n; i++)
+    {
+        // Zeruj częstotliwości poza zakresem 0.5-45Hz
+        if (i < iLow || i > iHigh)
+        {
+            if (i < n / 2)     complex[i]     = Complex.Zero;
+            if (n - i < n / 2) complex[n - i] = Complex.Zero;
+        }
+    }
+
+    Fourier.Inverse(complex, FourierOptions.Matlab);
+    return complex.Select(c => c.Real).ToArray();
+}
+
+// ── Moc pasma z FFT ───────────────────────────────────
+private static double BandPower(
+    Complex[] fft, int fs, int n, double fMin, double fMax)
+{
+    int iMin = (int)Math.Round(fMin * n / (double)fs);
+    int iMax = (int)Math.Round(fMax * n / (double)fs);
+
+    return fft
+        .Skip(iMin)
+        .Take(iMax - iMin)
+        .Sum(c => c.Magnitude * c.Magnitude) / n;
+}
 }

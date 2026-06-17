@@ -18,7 +18,9 @@ public class BioSignalRecording : IBaseModel
     public double? EegDelta { get; set; }            
     public double? EegTheta { get; set; }            
     public double? EegAlpha { get; set; }            
-    public double? EegBeta { get; set; }             
+    public double? EegBeta { get; set; }   
+
+    public string? EpochFeaturesJson { get; set; }          
 }
 
 public enum DeviceType { Movesense, BITalino }

@@ -4,6 +4,7 @@ using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations.BioSignal
 {
     [DbContext(typeof(BioSignalDbContext))]
-    partial class BioSignalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260614214340_AddEpochFeaturesJson")]
+    partial class AddEpochFeaturesJson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,9 +45,6 @@ namespace Backend.Migrations.BioSignal
 
                     b.Property<double?>("EegTheta")
                         .HasColumnType("float");
-
-                    b.Property<string>("EpochFeaturesJson")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("FileData")
                         .IsRequired()

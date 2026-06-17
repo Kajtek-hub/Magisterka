@@ -162,3 +162,4 @@ C:\src\flutter_projekty\Sleep_quality_app\Backend\obj\Debug\net10.0\refint\Backe
 C:\src\flutter_projekty\Sleep_quality_app\Backend\obj\Debug\net10.0\Backend.pdb
 C:\src\flutter_projekty\Sleep_quality_app\Backend\obj\Debug\net10.0\Backend.genruntimeconfig.cache
 C:\src\flutter_projekty\Sleep_quality_app\Backend\obj\Debug\net10.0\ref\Backend.dll
+C:\src\flutter_projekty\Sleep_quality_app\Backend\bin\Debug\net10.0\MathNet.Numerics.dll

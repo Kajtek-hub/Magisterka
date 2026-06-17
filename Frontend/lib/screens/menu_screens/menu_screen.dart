@@ -36,6 +36,8 @@ class MenuScreen extends StatelessWidget {
               CustomButton('/biosignal-charts', 'Biosignal Charts'),    
               const SizedBox(height: 20),
               CustomButton('/login-screen', 'Log out'),
+              const SizedBox(height: 20),
+              CustomButton('/sleep-analysis', 'Sleep Analysis'),
             ],
           ),
         ),

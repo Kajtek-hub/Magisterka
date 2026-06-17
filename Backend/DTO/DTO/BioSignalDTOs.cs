@@ -22,6 +22,8 @@ public class BioSignalMetaDTO
     public double? EegTheta { get; set; }
     public double? EegAlpha { get; set; }
     public double? EegBeta { get; set; }
+
+    public string? EpochFeaturesJson { get; set; }
 }
 
 public class BioSignalRawDTO
