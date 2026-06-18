@@ -7,7 +7,12 @@ import 'package:magisterka/ml/SleepQualityClassifier.dart';
 import 'package:magisterka/theme.dart';
 
 class SleepAnalysisScreen extends StatefulWidget {
-  const SleepAnalysisScreen({super.key});
+  final Map<String, dynamic>? preloadedRecording; // ← NOWE
+
+  const SleepAnalysisScreen({
+    super.key,
+    this.preloadedRecording, // ← NOWE
+  });
 
   @override
   State<SleepAnalysisScreen> createState() => _SleepAnalysisScreenState();
@@ -27,7 +32,16 @@ class _SleepAnalysisScreenState extends State<SleepAnalysisScreen> {
   @override
   void initState() {
     super.initState();
-    _classifier.load().then((_) => _loadRecordings());
+    _classifier.load().then((_) {
+      if (widget.preloadedRecording != null) {
+        // ← Wejście z BioSignalChartScreen — analizuj od razu
+        setState(() => _loading = false);
+        _analyze(widget.preloadedRecording!);
+      } else {
+        // ← Wejście z menu — pokaż listę nagrań
+        _loadRecordings();
+      }
+    });
   }
 
   @override
@@ -54,15 +68,33 @@ class _SleepAnalysisScreenState extends State<SleepAnalysisScreen> {
   }
 
   void _analyze(Map<String, dynamic> recording) {
-    final results = _classifier.classifyEpochs(
-      recording['epochFeaturesJson'] as String,
-    );
-    setState(() {
-      _selectedRecordingId = recording['id'] as String;
-      _epochResults = results;
-      _summary = _classifier.nightSummary(results);
-      _windowStart = 0;
-    });
+    try {
+      print("Starting analysis...");
+      print("epochFeaturesJson: ${recording['epochFeaturesJson']}");
+      
+      final results = _classifier.classifyEpochs(
+        recording['epochFeaturesJson'] as String,
+      );
+      
+      print("Results count: ${results.length}");
+      
+      setState(() {
+        _selectedRecordingId = recording['id'] as String;
+        _epochResults = results;
+        _summary = _classifier.nightSummary(results);
+        _windowStart = 0;
+      });
+      
+      print("Summary: $_summary");
+      
+    } catch (e) {
+      print("Analysis error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Analysis error: $e")),
+        );
+      }
+    }
   }
 
   String _formatTime(int seconds) {
@@ -119,7 +151,9 @@ class _SleepAnalysisScreenState extends State<SleepAnalysisScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _recordingPicker(),
+                            // Pokaż picker tylko gdy wejście z menu
+                            if (widget.preloadedRecording == null)
+                              _recordingPicker(),
                             if (_epochResults.isNotEmpty) ...[
                               const SizedBox(height: 16),
                               _summaryCard(),
@@ -236,7 +270,6 @@ class _SleepAnalysisScreenState extends State<SleepAnalysisScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          // ✅ Poprawione etykiety
           _summaryBar("Restorative", goodPct, Colors.greenAccent),
           _summaryBar("Fragmented",  modPct,  Colors.orangeAccent),
           _summaryBar("Disrupted",   poorPct, Colors.redAccent),
@@ -279,7 +312,6 @@ class _SleepAnalysisScreenState extends State<SleepAnalysisScreen> {
     final visible = _epochResults.sublist(_windowStart, windowEnd);
 
     final spots = visible.asMap().entries.map((e) {
-      // ✅ Poprawione etykiety
       final val = e.value.label == 'Restorative' ? 2.0
                 : e.value.label == 'Fragmented'  ? 1.0
                 : 0.0;
@@ -322,7 +354,6 @@ class _SleepAnalysisScreenState extends State<SleepAnalysisScreen> {
                     reservedSize: 72,
                     interval: 1,
                     getTitlesWidget: (v, _) {
-                      // ✅ Poprawione etykiety osi Y
                       final labels = {
                         0.0: 'Disrupted',
                         1.0: 'Fragmented',

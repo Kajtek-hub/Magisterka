@@ -76,7 +76,7 @@ class SleepQualityClassifier {
         (epoch['beta']       as num).toDouble(),
         (epoch['thetaAlpha'] as num).toDouble(),
         (epoch['deltaBeta']  as num).toDouble(),
-        (epoch['entropy']    as num).toDouble(),
+        epoch['entropy'] != null ? (epoch['entropy'] as num).toDouble() : 0.0,
       ];
 
       final normalized = _normalize(features);

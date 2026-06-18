@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:magisterka/api/biosignal_service.dart';
 import 'package:magisterka/api/secure_storage.dart';
-import 'package:magisterka/screens/bio_signals/SignalViewerScreen.dart'; // ← DODAJ
+import 'package:magisterka/screens/bio_signals/SignalViewerScreen.dart';
+import 'package:magisterka/screens/bio_signals/SleepAnalysisScreen.dart';
 import 'package:magisterka/theme.dart';
 
 class BioSignalChartScreen extends StatefulWidget {
@@ -22,7 +23,6 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
   @override
   void initState() {
     super.initState();
-    // Tylko jedna zakładka teraz — lista nagrań
     _tabController = TabController(length: 1, vsync: this);
     _loadRecordings();
   }
@@ -43,7 +43,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Błąd: $e")),
+          SnackBar(content: Text("Error: $e")),
         );
       }
     } finally {
@@ -76,7 +76,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
                     ),
                     Expanded(
                       child: Text(
-                        "Sygnały biologiczne",
+                        "Biosignals",
                         textAlign: TextAlign.center,
                         style: GoogleFonts.lato(
                           fontSize: 22,
@@ -108,7 +108,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
   Widget _recordingsList() {
     if (_recordings.isEmpty) {
       return const Center(
-        child: Text("Brak nagrań",
+        child: Text("No recordings",
             style: TextStyle(color: Colors.white54, fontSize: 16)),
       );
     }
@@ -126,6 +126,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
             "${date.year}  "
             "${date.hour.toString().padLeft(2, '0')}:"
             "${date.minute.toString().padLeft(2, '0')}";
+        final hasEpochs = r['epochFeaturesJson'] != null;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -185,25 +186,50 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
 
               const SizedBox(height: 10),
 
-              // ✅ Przycisk otwiera SignalViewerScreen z preloaded ID
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() => _selectedId = r['id'] as String);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SignalViewerScreen(
-                          preloadedRecordingId:   r['id']       as String,
-                          preloadedRecordingName: r['fileName'] as String,
+              // ── Dwa przyciski ─────────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() => _selectedId = r['id'] as String);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SignalViewerScreen(
+                              preloadedRecordingId:   r['id']       as String,
+                              preloadedRecordingName: r['fileName'] as String,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.show_chart, size: 16),
+                      label: const Text("Signal"),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Przycisk Analyze tylko dla BITalino z epochFeaturesJson
+                  if (!isMovesense && hasEpochs)
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SleepAnalysisScreen(
+                                preloadedRecording: r,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.bedtime, size: 16),
+                        label: const Text("Analyze"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigo,
                         ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.show_chart),
-                  label: const Text("Pokaż wykres"),
-                ),
+                    ),
+                ],
               ),
             ],
           ),
