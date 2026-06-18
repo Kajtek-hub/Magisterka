@@ -23,7 +23,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 1, vsync: this);
+    _tabController = TabController(length: 2, vsync: this); // ← 2 zakładki
     _loadRecordings();
   }
 
@@ -50,6 +50,13 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
       setState(() => _loadingList = false);
     }
   }
+
+  // Filtruj nagrania po typie urządzenia
+  List<dynamic> get _eegRecordings =>
+      _recordings.where((r) => r['deviceType'] == 'BITalino').toList();
+
+  List<dynamic> get _ecgRecordings =>
+      _recordings.where((r) => r['deviceType'] == 'Movesense').toList();
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +99,36 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
                   ],
                 ),
               ),
+
+              // ── Zakładki EEG / EKG ───────────────────
+              TabBar(
+                controller: _tabController,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white38,
+                indicatorColor: Theme_Colors.primary,
+                tabs: const [
+                  Tab(
+                    icon: Icon(Icons.psychology),
+                    text: "EEG — BITalino",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.favorite),
+                    text: "EKG — Movesense",
+                  ),
+                ],
+              ),
+
               Expanded(
                 child: _loadingList
                     ? const Center(
                         child: CircularProgressIndicator(color: Colors.white))
-                    : _recordingsList(),
+                    : TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _recordingsList(_eegRecordings, isMovesense: false),
+                          _recordingsList(_ecgRecordings, isMovesense: true),
+                        ],
+                      ),
               ),
             ],
           ),
@@ -105,20 +137,40 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
     );
   }
 
-  Widget _recordingsList() {
-    if (_recordings.isEmpty) {
-      return const Center(
-        child: Text("No recordings",
-            style: TextStyle(color: Colors.white54, fontSize: 16)),
+  Widget _recordingsList(List<dynamic> recordings, {required bool isMovesense}) {
+    if (recordings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isMovesense ? Icons.favorite_outline : Icons.psychology_outlined,
+              color: Colors.white24,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              isMovesense
+                  ? "No Movesense recordings yet"
+                  : "No BITalino recordings yet",
+              style: const TextStyle(color: Colors.white54, fontSize: 15),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Upload a recording through\nthe recording screen",
+              style: const TextStyle(color: Colors.white38, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       );
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _recordings.length,
+      itemCount: recordings.length,
       itemBuilder: (_, i) {
-        final r = _recordings[i] as Map<String, dynamic>;
-        final isMovesense = r['deviceType'] == 'Movesense';
+        final r = recordings[i] as Map<String, dynamic>;
         final date = DateTime.parse(r['recordedAt']).toLocal();
         final dateStr =
             "${date.day.toString().padLeft(2, '0')}."
@@ -127,6 +179,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
             "${date.hour.toString().padLeft(2, '0')}:"
             "${date.minute.toString().padLeft(2, '0')}";
         final hasEpochs = r['epochFeaturesJson'] != null;
+        final color = isMovesense ? Colors.redAccent : Colors.blueAccent;
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -145,15 +198,23 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    r['deviceType'] as String,
-                    style: TextStyle(
-                      color: isMovesense
-                          ? Colors.redAccent
-                          : Colors.blueAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        isMovesense ? Icons.favorite : Icons.psychology,
+                        color: color,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        r['deviceType'] as String,
+                        style: TextStyle(
+                          color: color,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                   Text(dateStr,
                       style: const TextStyle(
@@ -164,13 +225,14 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
               Text(
                 r['fileName'] as String,
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 10),
 
-              // Metryki
+              // ── Metryki ───────────────────────────────
               if (isMovesense) ...[
                 if (r['heartRate'] != null)
-                  _metricRow("HR", "${r['heartRate']} bpm"),
+                  _metricRow("Heart Rate", "${r['heartRate']} bpm"),
                 if (r['hRV'] != null)
                   _metricRow("HRV (RMSSD)", "${r['hRV']} ms"),
               ] else ...[
@@ -186,7 +248,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
 
               const SizedBox(height: 10),
 
-              // ── Dwa przyciski ─────────────────────────
+              // ── Przyciski ─────────────────────────────
               Row(
                 children: [
                   Expanded(
@@ -207,9 +269,9 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
                       label: const Text("Signal"),
                     ),
                   ),
-                  const SizedBox(width: 8),
                   // Przycisk Analyze tylko dla BITalino z epochFeaturesJson
-                  if (!isMovesense && hasEpochs)
+                  if (!isMovesense && hasEpochs) ...[
+                    const SizedBox(width: 8),
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
@@ -229,6 +291,7 @@ class _BioSignalChartScreenState extends State<BioSignalChartScreen>
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ],
